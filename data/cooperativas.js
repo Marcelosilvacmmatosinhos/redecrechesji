@@ -1,0 +1,10 @@
+var cooperativasData = {
+  "type": "FeatureCollection",
+  "name": "cooperativas",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "features": [
+    {"type":"Feature","id":1,"geometry":{"type":"Point","coordinates":[-8.69838196005935,41.18971845174519,0]},"properties":{"OBJECTID":1,"Name":"115.0","FolderPath":"Listagem Total de Entidades 1.xls","SymbolID":0,"AltMode":-1,"Base":0,"Snippet":" ","PopupInfo":"Designação: Cooperativa Múltipla Escolha<br>Freguesia: Leça da Palmeira<br>Estatuto Jurídico: Cooperativas<br>Telemóvel: 220995212 / 911852842<br>E-mail: geral@cooperativame.pt<br>Técnico Radar: Cláudia Silva<br>Gestor: <br>Morada: Rua Drª, R. D","HasLabel":-1,"LabelID":0,"OBJECTID_1":115,"ID":115,"Designaç":"Cooperativa Múltipla Escolha","Freguesia":"Leça da Palmeira","Estatuto_J":"Cooperativas","Telemóvel":"220995212 / 911852842","E_mail":"geral@cooperativame.pt","Técnico_R":"Cláudia Silva","Gestor":" ","Morada":"Rua Drª, R. Dr. José Domingues de Oliveira","N_º_da_po":"34","Código_po":"4450-710","Latitude":"41.189718452318225","Longitude":" -8.698381960317455","Observaç":" "}},
+    {"type":"Feature","id":2,"geometry":{"type":"Point","coordinates":[-8.657273917856969,41.17846943661527,0]},"properties":{"OBJECTID":2,"Name":"146.0","FolderPath":"Listagem Total de Entidades 1.xls","SymbolID":0,"AltMode":-1,"Base":0,"Snippet":" ","PopupInfo":"Designação: Cooperativa de Solidariedade Social, Construção e Habitação, Aldeia Nova Crl<br>Freguesia: Senhora da Hora<br>Estatuto Jurídico: Cooperativas<br>Telemóvel: 229376020<br>E-mail: ji.che@escolas.min-edu.pt; nanisoliveira@gmail.com<br>Té","HasLabel":-1,"LabelID":0,"OBJECTID_1":146,"ID":146,"Designaç":"Cooperativa de Solidariedade Social, Construção e Habitação, Aldeia Nova Crl","Freguesia":"Senhora da Hora","Estatuto_J":"Cooperativas","Telemóvel":"229376020","E_mail":"ji.che@escolas.min-edu.pt; nanisoliveira@gmail.com","Técnico_R":"Cristina Ferreira","Gestor":" ","Morada":"Praceta Aldeia Nova","N_º_da_po":"151","Código_po":"4460-215","Latitude":"41.178469436577984","Longitude":" -8.65727391796507","Observaç":" "}}
+    
+  ]
+  }
