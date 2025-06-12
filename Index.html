@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Cidade dos 15 Minutos</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <!-- Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="data/associacoes.js" type="text/javascript"></script>
+    <script src="data/cooperativas.js" type="text/javascript"></script>
+    <script src="data/privados.js" type="text/javascript"></script>
+    <script src="data/caldelas.js" type="text/javascript"></script>
+
+
+
+    <link href="https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.min.css" rel="stylesheet" />
+    <style>
+        #just {
+            text-align: justify;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .mapboxgl-popup-close-button {
+            position: absolute;
+            top: -15px;
+            /* Ajuste conforme necessário */
+            right: -15px;
+            /* Ajuste conforme necessário */
+            background-color: #007da8;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            /* Tamanho do botão */
+            height: 30px;
+            /* Tamanho do botão */
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            z-index: 1;
+            /* Para garantir que o botão esteja sempre acima do conteúdo do popup */
+        }
+
+        .mapboxgl-popup-close-button:hover {
+            background-color: red;
+            color: black;
+        }
+
+        #map {
+            position: absolute;
+  top: 50px;  /* deixa espaço para a barra */
+  bottom: 0;
+  width: 100%;
+        }
+#map-header {
+  position: fixed;   /* fixa no topo da janela */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: rgba(0, 123, 255, 0.9); /* azul semitransparente */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bureau', sans-serif; /* o mesmo da tua página */
+  font-size: 20px;
+  z-index: 9999; /* fica acima do mapa */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+        #map-overlay {
+            position: absolute;
+            bottom: 35px;
+            left: 10px;
+            color: black;
+            font-family: sans-serif;
+            font-size: 15px;
+            z-index: 1;
+        }
+
+
+
+
+
+
+        .mapboxgl-ctrl-geocoder {
+            right: 7%;
+        }
+
+        .map-overlay-2 {
+            position: fixed;
+            z-index: 1;
+            margin-top: 10%;
+            /* Ajuste conforme necessário */
+            right: 0;
+            padding: 2%;
+            border-radius: 5px;
+            background-color: white;
+            color: #007da8;
+            border-color: #007da8;
+
+
+        }
+
+        .categoryLabel-containner {
+            max-height: 300px;
+            /* Defina a altura máxima conforme necessário */
+border-color: #007da8;
+            border-radius: 5px;
+            margin-top: 7%;
+            /* Ajuste conforme necessário */
+            color: #007da8;
+            font-size: 15px;
+        }
+
+        .check-position {
+            padding: 10px 5px;
+        }
+
+        .icon-position {
+            width: 20px;
+            margin-bottom: -4px;
+        }
+
+        /* Estilo base */
+        .map-overlay-2 {
+            max-height: 80%;
+            /* Ajuste conforme necessário */
+            max-width: 80%;
+            /* Ajuste conforme necessário */
+        }
+
+        /* Media queries para diferentes tamanhos de tela */
+        @media screen and (max-width: 768px) {
+            .map-overlay-2 {
+                margin-top: 55%;
+                /* Ajuste conforme necessário */
+            }
+        }
+
+        @media screen and (min-width: 768px) {
+            .map-overlay-2 {
+                margin-top: 10%;
+                /* Ajuste conforme necessário */
+            }
+        }
+
+        @media screen and (min-width: 1200px) {
+            .map-overlay-2 {
+                margin-top: 7%;
+                /* Ajuste conforme necessário */
+            }
+        }
+
+
+        .arrow-to-show-and-hide {
+            transition: 1s ease-in-out;
+            cursor: pointer;
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            height: 100px;
+            border-radius: 15px;
+            background-color: white;
+    
+            width: 30px;
+            border-radius: 5px 0px 0px 5px;
+
+            padding-top: 20px;
+        }
+
+        .hide-labels {
+            transform: translateX(90%);
+    
+        }
+
+        .map-overlay-inner {
+            font-family: 'Letter Gothic Std Medium', sans-serif;
+
+        }
+
+        .Mypopup .mapboxgl-popup-content {
+            font-family: 'Letter Gothic Std Medium', sans-serif;
+            border-radius: 5px;
+            background-color: #fff;
+            color: rgb(6, 6, 6);
+            font-size: 15px;
+
+        }
+
+    
+      .legend-circle {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: #98e500; /* Mesma cor definida no mapa */
+        border-radius: 50%; /* Faz com que o círculo fique redondo */
+        margin-right: 10px; /* Espaço entre o círculo e o texto */
+    }
+    .legend-circle1 {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: #898943; /* Mesma cor definida no mapa */
+        border-radius: 50%; /* Faz com que o círculo fique redondo */
+        margin-right: 10px; /* Espaço entre o círculo e o texto */
+    }
+    .legend-circle2 {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: #d70a00; /* Mesma cor definida no mapa */
+        border-radius: 50%; /* Faz com que o círculo fique redondo */
+        margin-right: 10px; /* Espaço entre o círculo e o texto */
+    }
+    </style>
+</head>
+
+<body>
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet"
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+        type="text/css">
+
+    <script src="https://unpkg.com/@turf/turf@7.0.0/turf.min.js"></script>
+
+
+ <div id="map-header">
+  <h1>Rede de Creches</h1>
+</div>
+<div id="map" ></div>
+
+
+    <!-- The Modal -->
+
+
+    <div class='map-overlay-2' id="labels">
+        <div class="arrow-to-show-and-hide" onclick="handleClickHideLabels()">
+            <!-- Seta para a esquerda -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                style="stroke: #007da8; stroke-width: 3; fill: none;">
+                <path d="M10 19L6 12l4-7" />
+            </svg>
+
+            <!-- Seta para a direita -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                style="stroke: #007da8; stroke-width: 3; fill: none;">
+                <path d="M14 5l4 7-4 7" />
+            </svg>
+        </div>
+        <div class='map-overlay-inner'>
+            <h4 class="txt-m txt-bold mb6" style="font-family: 'Bureau', sans-serif;">Rede de Creches:</h4>
+            <div class="categoryLabel-containner">
+                <div class="check-position">
+                    <input type="checkbox" id="associacoesCB" value="associacoes" onchange="switchlayer('associacoes')" checked />
+                    <label for="associacoesCB">
+                        <span class="legend-circle"></span> Associações
+                    </label>
+                </div>
+                <div class="check-position">
+                    <input type="checkbox" id="cooperativasCB" value="cooperativas" onchange="switchlayer('cooperativas')" checked />
+                    <label for="cooperativasCB">
+                        <span class="legend-circle1"></span> Cooperativas
+                    </label>
+                </div>
+                <div class="check-position">
+                    <input type="checkbox" id="privadosCB" value="privados" onchange="switchlayer('privados')" checked />
+                    <label for="privadosCB">
+                        <span class="legend-circle2"></span>Entidades Privadas
+                    </label>
+                </div>
+                
+            </div>
+            </div>
+
+        
+            <div class="check-position" style="text-align: center;">
+                <button class="btn btn-info" onclick="handleClickOnAndOff()"
+                    style="display: inline-block; background-color:#007da8;">Todas</button>
+            </div>
+        </div>
+    </div>
+    <script>
+   
+        const generateLayer = (layerName, img, sourceData) => {
+            return map.loadImage(
+                img,
+                (error, image) => {
+                    if (error) throw error;
+                    const img = `${layerName}-img`;
+                    map.addImage(img, image);
+                    // Add a symbol layer
+                    map.addLayer({
+                        'id': layerName,
+                        'type': 'symbol',
+                        'source': {
+                            'type': 'geojson',
+                            'data': sourceData
+                        },
+                        'layout': {
+                            'icon-image': img,
+                            'icon-size': 0.6,
+                            'icon-allow-overlap': true
+                        }
+                    });
+                }
+            );
+        }
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoibWFyY2Vsb2xtc2lsdmEiLCJhIjoiY2t3cGRtdnMyMDhsazJvcnR2M2Ric282eSJ9.uus1HR47tEE_5vKGMtp42A';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12', //custom stylesheet
+            center: [-8.672642553785273, 41.21426072441039], // starting position [lng, lat]
+            zoom: 12, // starting zoom
+        });
+
+        map.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            // When active the map will receive updates to the device's location as it changes.
+            trackUserLocation: true,
+            // Draw an arrow next to the location dot to indicate which direction the device is heading.
+            showUserHeading: true
+        })
+    );
+map.on('load', () => {
+  // Atualiza a fonte com os dados já com o campo capacidade
+  map.addSource('privados', {
+    type: 'geojson',
+    data: privadosData
+  });
+
+  // Círculos
+  map.addLayer({
+    id: 'privados-circles',
+    type: 'circle',
+    source: 'privados',
+    paint: {
+                'circle-radius': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'ID'],
+                    1, 6,
+                    100, 30
+                ],
+                'circle-color': '#d70a00',
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': 1,
+                'circle-opacity': 0.8
+            }
+        });
+
+  // Labels com capacidade
+  map.addLayer({
+    id: 'privados-labels',
+    type: 'symbol',
+    source: 'privados',
+  layout: {
+    'text-field': ['to-string', ['get', 'ID']],
+    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+    'text-size': 14,
+    'text-offset': [0, 0],          // ← Sem deslocamento
+    'text-anchor': 'center'         // ← Ancorado ao centro
+  },
+  paint: {
+    'text-color': '#000',
+    'text-halo-color': '#fff',
+    'text-halo-width': 1
+  }
+  });
+});
+
+        map.on('load', () => {
+    // Adiciona a camada "caldelas"
+    map.addLayer({
+        'id': 'caldelas',
+        'type': 'line',
+        "source": {
+            "type": "geojson",
+            "data": caldelasData,
+        },
+        'layout': {},
+        'paint': {
+            'line-color': '#332FD0', // Cor da linha do polígono
+            'line-width': 4 // Largura da linha do polígono
+        }
+    });
+    map.on('load', function () {
+            map.addSource('freguesias', {
+                'type': 'geojson',
+                'data': freguesiasData
+            });
+
+            // Add a layer to display the MultiPolygon
+            map.addLayer({
+                'id': 'maine',
+                'type': 'fill',
+                'source': 'freguesias', // reference the GeoJSON source
+                'layout': {},
+                'paint': {
+                    'fill-color': '#0080ff', // blue color fill
+                    'fill-opacity': 0.5
+                }
+            });
+
+
+        });
+
+    map.addSource('iso', {
+        type: 'geojson',
+        data: {
+            'type': 'FeatureCollection',
+            'features': []
+        }
+    });
+
+
+
+
+ 
+    map.loadImage('https://i.ibb.co/B3tMfHJ/icons8-tipo-de-pele-idosa-6-60.png', function (error, image) {
+        if (error) throw error;
+        
+
+        // Adiciona a imagem ao mapa
+        map.addImage('associacoes-icon', image);
+
+        // Adiciona a camada "Deficiência"
+        map.addLayer({
+            "id": "associacoes",
+           "type": "circle",
+            "source": {
+                "type": "geojson",
+                "data": associacoesData,
+            },
+            "layout": {},
+        "paint": {
+            "circle-color": "#98e500",
+        }
+        });
+        
+
+        // Evento de clique na camada "Deficiência"
+        map.on('click', 'associacoes', function (e) {
+            let coordinates = e.lngLat; // Obtém as coordenadas do local clicado
+            let name = e.features[0].properties.Designaç; // Obtém o nome da propriedade
+
+            // Cria o popup
+            let popup = new mapboxgl.Popup({
+                className: "Mypopup",
+                closeButton: true,
+                closeOnClick: true,
+                offset: [0, -10],
+            });
+
+            // Define o conteúdo e a posição do popup
+            popup
+                .setLngLat(coordinates)
+                .setHTML(name)
+                .addTo(map);
+        });
+
+        // Altera o cursor ao passar sobre os ícones de "Deficiência"
+        map.on('mouseenter', 'associacoes', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Retorna o cursor ao normal ao sair da camada "Deficiência"
+        map.on('mouseleave', 'associacoes', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+    map.loadImage('https://i.ibb.co/B3tMfHJ/icons8-tipo-de-pele-idosa-6-60.png', function (error, image) {
+        if (error) throw error;
+        
+
+        // Adiciona a imagem ao mapa
+        map.addImage('cooperativas-icon', image);
+
+        // Adiciona a camada "Deficiência"
+        map.addLayer({
+            "id": "cooperativas",
+           "type": "circle",
+            "source": {
+                "type": "geojson",
+                "data": cooperativasData,
+            },
+            "layout": {},
+        "paint": {
+            "circle-color": "#898943",
+        }
+        });
+        
+
+        // Evento de clique na camada "Deficiência"
+        map.on('click', 'cooperativas', function (e) {
+            let coordinates = e.lngLat; // Obtém as coordenadas do local clicado
+            let name = e.features[0].properties.Designaç; // Obtém o nome da propriedade
+
+            // Cria o popup
+            let popup = new mapboxgl.Popup({
+                className: "Mypopup",
+                closeButton: true,
+                closeOnClick: true,
+                offset: [0, -10],
+            });
+
+            // Define o conteúdo e a posição do popup
+            popup
+                .setLngLat(coordinates)
+                .setHTML(name)
+                .addTo(map);
+        });
+
+        // Altera o cursor ao passar sobre os ícones de "Deficiência"
+        map.on('mouseenter', 'cooperativas', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Retorna o cursor ao normal ao sair da camada "Deficiência"
+        map.on('mouseleave', 'cooperativas', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+    map.loadImage('https://i.ibb.co/B3tMfHJ/icons8-tipo-de-pele-idosa-6-60.png', function (error, image) {
+        if (error) throw error;
+        
+
+        // Adiciona a imagem ao mapa
+        map.addImage('privados-icon', image);
+
+        // Adiciona a camada "Deficiência"
+        map.addLayer({
+            "id": "privados",
+           "type": "circle",
+            "source": {
+                "type": "geojson",
+                "data": privadosData,
+            },
+            "layout": {},
+        "paint": {
+            "circle-color": "#d70a00",
+        }
+        });
+        
+
+        // Evento de clique na camada "Deficiência"
+        map.on('click', 'privados', function (e) {
+            let coordinates = e.lngLat; // Obtém as coordenadas do local clicado
+            let name = e.features[0].properties.Nome; // Obtém o nome da propriedade
+
+            // Cria o popup
+            let popup = new mapboxgl.Popup({
+                className: "Mypopup",
+                closeButton: true,
+                closeOnClick: true,
+                offset: [0, -10],
+            });
+
+            // Define o conteúdo e a posição do popup
+            popup
+                .setLngLat(coordinates)
+                .setHTML(nam)
+                .addTo(map);
+        });
+
+        // Altera o cursor ao passar sobre os ícones de "Deficiência"
+        map.on('mouseenter', 'privados', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Retorna o cursor ao normal ao sair da camada "Deficiência"
+        map.on('mouseleave', 'privados', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+   
+
+});
+
+        function switchlayer(lname, show = false) {
+            if (document.getElementById(lname + "CB").checked || show) {
+                map.setLayoutProperty(lname, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(lname, 'visibility', 'none');
+            }
+        }
+
+        let show = true;
+
+        function handleClickOnAndOff() {
+            if (show) {
+                hideAll();
+                show = false;
+            } else {
+                showAll();
+                show = true;
+            }
+        }
+
+        function hideAll() {
+
+            map.setLayoutProperty('associacoes', 'visibility', 'none');
+            document.getElementById("associacoesCB").checked = false;
+            map.setLayoutProperty('cooperativas', 'visibility', 'none');
+            document.getElementById("cooperativasCB").checked = false;
+            map.setLayoutProperty('privados', 'visibility', 'none');
+            document.getElementById("privadosCB").checked = false;
+
+        }
+
+        function showAll() {
+
+            
+            map.setLayoutProperty('associacoes', 'visibility', 'visible');
+            document.getElementById("associacoesCB").checked = true;
+            map.setLayoutProperty('cooperativas', 'visibility', 'visible');
+            document.getElementById("cooperativasCB").checked = true;
+            map.setLayoutProperty('privados', 'visibility', 'visible');
+            document.getElementById("privadosCB").checked = true;
+
+        }
+
+        let showLabels = true;
+
+        function handleClickHideLabels() {
+            const elem = document.getElementById('labels');
+            if (showLabels) {
+                elem.classList.add('hide-labels');
+                showLabels = false;
+            } else {
+                elem.classList.remove('hide-labels');
+                showLabels = true;
+            }
+        }
+
+   
+    </script>
+</body>
+
+</html>
